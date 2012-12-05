@@ -1,0 +1,13 @@
+<aegis>
+        <request policy="add">
+            <credential name="UID::user" />
+            <credential name="GID::users" />
+            <credential name="GRP::users" />
+            <credential name="TrackerReadAccess" />
+            <credential name="TrackerWriteAccess" />
+            <credential name="GRP::metadata-users" />
+            <credential name="Cellular" />
+            <credential name="Location" />
+            <for path="/opt/synctool/bin/synctool.py" />
+        </request>
+</aegis>

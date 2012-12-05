@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=SyncTool
+Exec=/opt/synctool/bin/synctool_init.py
+Icon=/usr/share/icons/hicolor/80x80/apps/synctool.png
+Categories=Development;

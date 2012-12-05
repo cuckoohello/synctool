@@ -1,0 +1,11 @@
+[Project]
+category = Development
+maintainer = Shan Yafeng
+appname = SyncTool
+section = development
+pyversion = 2.7
+project = synctool
+email = cuckoohello@gmail.com
+desc = Backup your sms/im/call logs to an imap server such as gmail!
+template = harmattan
+
