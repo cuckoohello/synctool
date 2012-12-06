@@ -9,17 +9,17 @@ Page {
         visible: true
         ToolIcon{
 
-             id:menuTool
-             enabled: true
-             iconId: "toolbar-view-menu";
-             visible:true
+            id:menuTool
+            enabled: true
+            iconId: "toolbar-view-menu";
+            visible:true
 
             anchors.verticalCenter:  parent.verticalCenter
             anchors.right: (parent === undefined) ? undefined : parent.right
             onClicked:
-            (contentmenu.status === DialogStatus.Closed) ? contentmenu.open() : contentmenu.close()
+                (contentmenu.status === DialogStatus.Closed) ? contentmenu.open() : contentmenu.close()
 
-          }
+        }
 
     }
 
@@ -30,23 +30,23 @@ Page {
         anchors.horizontalCenter: parent.horizontalCenter
         visualParent: pageStack
         MenuLayout {
-        MenuItem {
-            text: "Account"
-            enabled : !syncTool.isSyncing
-            onClicked:goto_page("AccountPage.qml",syncTool.getAccountInfo())}
-        MenuItem { text: "Sections"
-            enabled : !syncTool.isSyncing
-           onClicked:goto_page("SectionsPage.qml")}
-        MenuItem { text: "About"
-            onClicked:goto_page("AboutPage.qml")}
-        MenuItem { text: "Hide"
-            onClicked:hideSignal()}
-        MenuItem { text: "Exit"
-            enabled : !syncTool.isSyncing
-          onClicked:quitConfirm.open() }
+            MenuItem {
+                text: "Account"
+                enabled : !syncTool.isSyncing
+                onClicked:goto_page("AccountPage.qml",syncTool.getAccountInfo())}
+            MenuItem { text: "Sections"
+                enabled : !syncTool.isSyncing
+                onClicked:goto_page("SectionsPage.qml")}
+            MenuItem { text: "About"
+                onClicked:goto_page("AboutPage.qml")}
+            MenuItem { text: "Hide"
+                onClicked:hideSignal()}
+            MenuItem { text: "Exit"
+                enabled : !syncTool.isSyncing
+                onClicked:quitConfirm.open() }
         }
 
-       }
+    }
     Header {
         id: header
         color: UI.HEADER_COLOR
@@ -60,23 +60,23 @@ Page {
             horizontalCenter: parent.horizontalCenter
             topMargin: UI.NORMAL_MARGIN
         }
-        source: syncTool.currentMainIconSource 
+        source: syncTool.currentMainIconSource
         width: parent.width/4
         height: width
     }
 
     Label {
-      id: label
-      text: syncTool.currentLog
-      font.pixelSize: UI.FONT_DEFAULT_SIZE
-      width: 300
-      wrapMode: 'WordWrap'
+        id: label
+        text: syncTool.currentLog
+        font.pixelSize: UI.FONT_DEFAULT_SIZE
+        width: 300
+        wrapMode: 'WordWrap'
 
-      anchors {
+        anchors {
             top : logo.bottom
             horizontalCenter : parent.horizontalCenter
             topMargin : UI.NORMAL_MARGIN
-      }
+        }
     }
 
     ProgressBar {
@@ -98,14 +98,14 @@ Page {
             bottomMargin : parent.height*2/9
         }
         Button {
-           text: "Start"
-           enabled : !syncTool.isSyncing
-           onClicked: syncTool.start()
+            text: "Start"
+            enabled : !syncTool.isSyncing
+            onClicked: syncTool.start()
         }
         Button {
-           text: "Stop"
-           enabled : syncTool.isSyncing
-           onClicked: syncTool.stop()
+            text: "Stop"
+            enabled : syncTool.isSyncing
+            onClicked: syncTool.stop()
         }
     }
 

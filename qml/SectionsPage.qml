@@ -9,20 +9,20 @@ Page {
     tools : ToolBarLayout {
         visible: true
 
-         ToolButton {
+        ToolButton {
             text: "Add"
             anchors{
-              centerIn: parent
+                centerIn: parent
             }
             onClicked: {
-              goto_page("SectionPage.qml", {isAdd: true});
+                goto_page("SectionPage.qml", {isAdd: true});
             }
-         }
+        }
         ToolIcon {
             iconId: "toolbar-back"
             anchors{
-              verticalCenter:parent.verticalCenter
-              left: parent.left
+                verticalCenter:parent.verticalCenter
+                left: parent.left
             }
             onClicked: {
                 pageStack.pop();
@@ -38,13 +38,13 @@ Page {
 
 
     CommonList{
-      id : session_list
-      anchors{
-        top: header.bottom
-        left: parent.left
-        right: parent.right
-        bottom: parent.bottom
-      }
+        id : session_list
+        anchors{
+            top: header.bottom
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
         onItemClicked: {
             goto_page("SectionPage.qml", {section: filter});
         }
@@ -56,18 +56,18 @@ Page {
             var i
             for (i in sections)
             {
-              var title = sections[i];
-              var subtitle = [{title:syncTool.getConfigOption(title,'type')}]
-              var iconSource = syncTool.getAccountIcon(syncTool.getConfigOption(title,'account'))
-              if (subtitle[0]['title'] == '')
-                subtitle[0]['title'] = 'None'
-              session_list.model.append({
-                  title: title,
-                  subtitle: subtitle,
-                  iconSource: iconSource,
-                  //iconSource: "./images/sms-backup.png",
-                  filter: title
-              })
+                var title = sections[i];
+                var subtitle = [{title:syncTool.getConfigOption(title,'type')}]
+                var iconSource = syncTool.getAccountIcon(syncTool.getConfigOption(title,'account'))
+                if (subtitle[0]['title'] == '')
+                    subtitle[0]['title'] = 'None'
+                session_list.model.append({
+                                              title: title,
+                                              subtitle: subtitle,
+                                              iconSource: iconSource,
+                                              //iconSource: "./images/sms-backup.png",
+                                              filter: title
+                                          })
             }
         }
     }

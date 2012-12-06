@@ -20,7 +20,7 @@ import dbus.service
 import dbus.glib
 import dbus.mainloop
 
-version = '1.1.0'
+version = '1.1.1'
 
 class SyncTool(QObject):
     '''
@@ -81,21 +81,21 @@ class SyncTool(QObject):
     @Slot(result='QVariant')
     def getAccountInfo(self):
         if self.has_get_config == False:
-          self.loadConfig()
+            self.loadConfig()
         return {u'username':unicode(self.username,'utf8'),u'password':unicode(self.password,'utf8'),u'imapserver':unicode(self.imapserver,'utf8')}
 
     @Slot(result='QVariant')
     def getConfigSections(self):
         if self.has_get_config == False:
-          self.loadConfig()
+            self.loadConfig()
         sections = self.config.sections()
         try:
-           sections.remove('account')
+            sections.remove('account')
         except ValueError:
-          pass
+            pass
         secs = []
         for section in sections:
-          secs.append(unicode(section,'utf8'))
+            secs.append(unicode(section,'utf8'))
         return secs
 
     @Slot(unicode)
@@ -107,19 +107,19 @@ class SyncTool(QObject):
     def setConfigSection(self,sectionConfig):
         section = sectionConfig[u'sectionName'].encode('utf8')
         if sectionConfig[u'isAdd']:
-          if self.config.has_section(section):
-            return [False,u"Section name %s has already existed!"%(unicode(section,'utf8'))]
-          self.config.add_section(section)
-        else:
-          originSection = sectionConfig[u'section'].encode('utf8')
-          if section != originSection:
             if self.config.has_section(section):
-              return [False,u"Section name %s has already existed!"%(unicode(section,'utf8'))]
+                return [False,u"Section name %s has already existed!"%(unicode(section,'utf8'))]
+            self.config.add_section(section)
+        else:
+            originSection = sectionConfig[u'section'].encode('utf8')
+            if section != originSection:
+                if self.config.has_section(section):
+                    return [False,u"Section name %s has already existed!"%(unicode(section,'utf8'))]
             items = self.config.items(originSection)
             self.config.remove_section(originSection)
             self.config.add_section(section)
             for item in items:
-              self.config.set(section,item[0],item[1])
+                self.config.set(section,item[0],item[1])
 
         sectionConfig.pop(u'isAdd')
         sectionConfig.pop(u'section')
@@ -132,7 +132,7 @@ class SyncTool(QObject):
     @Slot(unicode,unicode,result=unicode)
     def getConfigOption(self,section,option):
         if self.has_get_config == False:
-          self.loadConfig()
+            self.loadConfig()
         try:
             return unicode(self.config.get(section.encode('utf8'),option.encode('utf8')),'utf8')
         except ConfigParser.NoOptionError:
@@ -153,7 +153,7 @@ class SyncTool(QObject):
         self.config.set('account','password',base64.encodestring(self.password))
         self.config.set('account','imapserver',self.imapserver)
         self.saveConfig()
-       
+
 
     def getCurrentMessageNumber(self):
         return self.currentMessageNumber+1
@@ -174,7 +174,6 @@ class SyncTool(QObject):
             notify=totalMessageChanged)
 
     currentIdChanged = Signal()
-
 
     def getCurrentLog(self):
         return unicode(self.log,'utf8')
@@ -198,8 +197,8 @@ class SyncTool(QObject):
         self.mess_type = mess_type
         self.channel = account
         if self.manager == None:
-          self.manager = SyncHelp.SyncTool()
-          self.timeZone = self.manager.getTimeZone()
+            self.manager = SyncHelp.SyncTool()
+            self.timeZone = self.manager.getTimeZone()
         self.currentMessageNumber = -1
         self.currentMessageIdChanged.emit()
         self.total =  self.manager.selectChannel(dic)
@@ -229,26 +228,26 @@ class SyncTool(QObject):
         except KeyError: 
             stdout = os.popen('mc-tool show %s | awk \'/Service:/ {printf "/usr/share/accounts/services/"$2".service" }\' | xargs awk -F "[<>]" \'/icon-m-normal/ {printf "image://theme/"$3}\''%(account.encode('utf8'))).read()
             if stdout == '':
-              stdout = './images/sms-backup.png'
+                stdout = './images/sms-backup.png'
             self.iconsDic[account] = stdout;
             return unicode(stdout,'utf8')
 
     @Slot(result='QVariant')
     def getAvailableAccounts(self):
         if self.has_get_config == False:
-          self.loadConfig()
+            self.loadConfig()
         sections = self.config.sections()
         try:
-           sections.remove('account')
+            sections.remove('account')
         except ValueError:
-          pass
+            pass
         accounts = self.getAccounts()
         for section in sections:
-          accounts.remove(self.config.get(section,'account'))
+            accounts.remove(self.config.get(section,'account'))
         accounts.remove('mmscm/mms/mms0')
         accs = []
         for account in accounts:
-          accs.append(unicode(account,'utf8'))
+            accs.append(unicode(account,'utf8'))
         return accs
 
     def getConfig(self):
@@ -272,16 +271,16 @@ class SyncTool(QObject):
 
     def logout(self):
         if self.has_login: 
-          try:
-             self.imapser.close()
-             self.imapser.logout()
-          except imaplib.IMAP4.error:
-             pass
-          del self.imapser
-          self.has_login = False
+            try:
+                self.imapser.close()
+                self.imapser.logout()
+            except imaplib.IMAP4.error:
+                pass
+            del self.imapser
+            self.has_login = False
         if self.manager:
-          del self.manager
-          self.manager = None
+            del self.manager
+            self.manager = None
 
     def selectMailBox(self,mailbox):
         if self.has_login == False:
@@ -352,7 +351,7 @@ class SyncTool(QObject):
         -1 no config account
         '''
         if self.config:
-          del self.config
+            del self.config
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.configFile)
         self.has_get_config = True
@@ -370,7 +369,7 @@ class SyncTool(QObject):
     @Slot()
     def start(self):
         if self.thread:
-          return
+            return
         self.setCurrentLog('<center>Starting...</center>')
         self.stop_thread = False
         self.setCurrentStatus(True)
@@ -381,8 +380,8 @@ class SyncTool(QObject):
     @Slot()
     def stop(self):
         if self.stop_thread == False:
-           self.setCurrentLog('<center>Stopping....</center>')
-           self.stop_thread = True
+            self.setCurrentLog('<center>Stopping....</center>')
+            self.stop_thread = True
 
     def thread_proc(self):
         self.currentMessageNumber = -1
@@ -400,13 +399,13 @@ class SyncTool(QObject):
 
         for section in sections:
             if self.stop_thread:
-              break
+                break
             account = self.config.get(section,'account')
             self.setMainIconSource(self.getAccountIcon(unicode(account,'utf8')))
             channels = self.config.get(section,'type').split('/')
             for channel in channels:
                 if self.stop_thread:
-                  break
+                    break
                 self.setCurrentLog('<center>Section:%s</center>\n<center>Account:%s</center>\n<center>Type:%s</center>'%(section,account,channel))
                 last_time = self.config.get(section,'time_'+channel)
                 header_format = self.config.get(section,'header_format_'+channel)
@@ -441,16 +440,16 @@ class SyncTool(QObject):
                 self.setSubjectFormat(header_format)
                 for i in range(0,count):
                     if self.stop_thread:
-                       break
+                        break
                     self.setCurrentLog('<center>Section:%s Type:%s</center>\n<center>Total messages:</center>\n<center>%d/%d</center>'%(section.upper(),channel.upper(),i+1,count))
                     message = self.getMessage(i)
                     mail,sms_time = self.createEmail(message)
                     try:
-                       self.backupMessage(mail,flags,sms_time)
-                       if i%50 == 25:
-                          self.config.set(section,'time_'+channel,message['EndTime'])
-                          self.saveConfig()
-                          self.imapser.expunge()
+                        self.backupMessage(mail,flags,sms_time)
+                        if i%50 == 25:
+                            self.config.set(section,'time_'+channel,message['EndTime'])
+                            self.saveConfig()
+                            self.imapser.expunge()
                     except:
                         self.setCurrentLog('<center>Network error!</center>\n<center>Force Stop!!!</center>')
                         self.stop_thread = True
@@ -461,9 +460,9 @@ class SyncTool(QObject):
                             message['EndTime'] = self.config.get(section,'time_'+channel)
 
                 if i !=0 :
-                   self.config.set(section,'time_'+channel,message['EndTime'])
-                   self.saveConfig()
-                   self.imapser.expunge()
+                    self.config.set(section,'time_'+channel,message['EndTime'])
+                    self.saveConfig()
+                    self.imapser.expunge()
 
         self.logout()
         self.saveConfig()
@@ -535,17 +534,17 @@ class SyncService(dbus.service.Object):
     DEFAULT_NAME = 'com.cuckoo.meego.SyncTool'
     DEFAULT_PATH = '/' 
     DEFAULT_INTF = 'com.cuckoo.meego.SyncTool'
-    
+
     def __init__(self,ui):
         source_name = "SyncToolService"
         self.ui = ui
         dbus_main_loop = dbus.glib.DBusGMainLoop(set_as_default=True)
         session_bus = dbus.SessionBus(dbus_main_loop)
         self.userId = os.geteuid();
-    
+
         self.local_name = '.'.join([self.DEFAULT_NAME, source_name])
         bus_name = dbus.service.BusName(self.local_name, bus=session_bus)
-    
+
         dbus.service.Object.__init__(self,object_path=self.DEFAULT_PATH,bus_name=bus_name)
 
     @dbus.service.method(DEFAULT_INTF)
@@ -554,9 +553,7 @@ class SyncService(dbus.service.Object):
 
 
 if __name__ == "__main__":
-        app = QApplication(sys.argv)
-        view = QSyncToolUI(app)
-
-        view.showFullScreen()
-
-        app.exec_()
+    app = QApplication(sys.argv)
+    view = QSyncToolUI(app)
+    view.showFullScreen()
+    app.exec_()

@@ -39,7 +39,7 @@ PageStackWindow {
         acceptButtonText: "Yes"
         rejectButtonText: "No"
         onAccepted: quit();
-    }    
+    }
 
     initialPage: MainPage{}
 }

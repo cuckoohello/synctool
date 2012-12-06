@@ -17,12 +17,12 @@ Page {
 
     function isNewerVersion(origin,now)
     {
-      var orgs = origin.split('.')
-      var nows = now.split('.')
-      if (parseInt(orgs[0])< parseInt(nows[0]) || parseInt(orgs[1])< parseInt(nows[1]) || parseInt(orgs[2]) < parseInt(nows[2]))
-        return true;
-      else
-        return false;
+        var orgs = origin.split('.')
+        var nows = now.split('.')
+        if (parseInt(orgs[0])< parseInt(nows[0]) || parseInt(orgs[1])< parseInt(nows[1]) || parseInt(orgs[2]) < parseInt(nows[2]))
+            return true;
+        else
+            return false;
     }
 
     Header {
@@ -96,7 +96,7 @@ Page {
                 visible: running
                 anchors.horizontalCenter : parent.horizontalCenter
                 platformStyle: BusyIndicatorStyle{
-                  size: "large"
+                    size: "large"
                 }
             }
 
@@ -105,24 +105,24 @@ Page {
                 text: 'Check Update!'
                 enabled: ! getVersionIndicator.running
                 onClicked:  {
-                  getVersionIndicator.running = true
-                  var xmlHttp = new XMLHttpRequest();
-                  xmlHttp.onreadystatechange = function() {
-                     if (xmlHttp.readyState == XMLHttpRequest.DONE) {
-                         getVersionIndicator.running = false;
-                         var version = xmlHttp.responseText;
-                         if (isNewerVersion(syncTool.getCurrentVersion(),version))
-                         {
-                           show_info_bar('Find new version:'+version);
-                           Qt.openUrlExternally('http://cloud.github.com/downloads/cuckoohello/synctool/synctool_'+version+'_armel.deb')
-                         }else
-                         {
-                           show_info_bar('Your version is up to date!');
-                         }
-                     }
-                  }
-                  xmlHttp.open( "GET", "http://cloud.github.com/downloads/cuckoohello/synctool/version.txt")
-                  xmlHttp.send();
+                    getVersionIndicator.running = true
+                    var xmlHttp = new XMLHttpRequest();
+                    xmlHttp.onreadystatechange = function() {
+                                if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                                    getVersionIndicator.running = false;
+                                    var version = xmlHttp.responseText;
+                                    if (isNewerVersion(syncTool.getCurrentVersion(),version))
+                                    {
+                                        show_info_bar('Find new version:'+version);
+                                        Qt.openUrlExternally('http://cloud.github.com/downloads/cuckoohello/synctool/synctool_'+version+'_armel.deb')
+                                    }else
+                                    {
+                                        show_info_bar('Your version is up to date!');
+                                    }
+                                }
+                            }
+                    xmlHttp.open( "GET", "http://cloud.github.com/downloads/cuckoohello/synctool/version.txt")
+                    xmlHttp.send();
                 }
             }
         }
