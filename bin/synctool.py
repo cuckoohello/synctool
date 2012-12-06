@@ -5,8 +5,7 @@ from PySide.QtGui import *
 from PySide.QtDeclarative import *
 from QtMobility.Contacts import *
 import SyncHelp
-import sys
-import os
+import os,sys,locale
 import imaplib
 import email
 import email.Message
@@ -20,7 +19,7 @@ import dbus.service
 import dbus.glib
 import dbus.mainloop
 
-version = '1.1.1'
+version = '1.1.2'
 
 class SyncTool(QObject):
     '''
@@ -33,7 +32,7 @@ class SyncTool(QObject):
         self.has_login = False
         self.date_format = 'yyyy-MM-dd-hh:mm:ss'
         self.total = 0
-        self.log = 'Press start button to start!'
+        self.log = self.tr('Press start button to start!')
         self.currentMessageNumber = -1
         self.thread = None
         self.configFile = '/home/user/.synctool.conf'
@@ -108,13 +107,13 @@ class SyncTool(QObject):
         section = sectionConfig[u'sectionName'].encode('utf8')
         if sectionConfig[u'isAdd']:
             if self.config.has_section(section):
-                return [False,u"Section name %s has already existed!"%(unicode(section,'utf8'))]
+                return [False,self.tr("Section name {0} has already existed!").format(unicode(section,'utf8'))]
             self.config.add_section(section)
         else:
             originSection = sectionConfig[u'section'].encode('utf8')
             if section != originSection:
                 if self.config.has_section(section):
-                    return [False,u"Section name %s has already existed!"%(unicode(section,'utf8'))]
+                    return [False,self.tr("Section name {0} has already existed!").format(unicode(section,'utf8'))]
             items = self.config.items(originSection)
             self.config.remove_section(originSection)
             self.config.add_section(section)
@@ -176,7 +175,7 @@ class SyncTool(QObject):
     currentIdChanged = Signal()
 
     def getCurrentLog(self):
-        return unicode(self.log,'utf8')
+        return self.log
 
     logMessageChanged = Signal()
 
@@ -370,7 +369,7 @@ class SyncTool(QObject):
     def start(self):
         if self.thread:
             return
-        self.setCurrentLog('<center>Starting...</center>')
+        self.setCurrentLog(self.tr('<center>Starting...</center>'))
         self.stop_thread = False
         self.setCurrentStatus(True)
         self.thread = threading.Thread(target=self.thread_proc)
@@ -380,16 +379,16 @@ class SyncTool(QObject):
     @Slot()
     def stop(self):
         if self.stop_thread == False:
-            self.setCurrentLog('<center>Stopping....</center>')
+            self.setCurrentLog(self.tr('<center>Stopping....</center>'))
             self.stop_thread = True
 
     def thread_proc(self):
         self.currentMessageNumber = -1
         self.currentMessageIdChanged.emit()
-        self.setCurrentLog('<center>Loading config...</center>')
+        self.setCurrentLog(self.tr('<center>Loading config...</center>'))
         ret = self.loadConfig()
         if ret == -1:
-            self.setCurrentLog('<center>Read account config error!</center>')
+            self.setCurrentLog(self.tr('<center>Read account config error!</center>'))
             self.stop_thread = True
             self.thread = None
             return
@@ -404,9 +403,11 @@ class SyncTool(QObject):
             self.setMainIconSource(self.getAccountIcon(unicode(account,'utf8')))
             channels = self.config.get(section,'type').split('/')
             for channel in channels:
+                if channel == '':
+                    continue
                 if self.stop_thread:
                     break
-                self.setCurrentLog('<center>Section:%s</center>\n<center>Account:%s</center>\n<center>Type:%s</center>'%(section,account,channel))
+                self.setCurrentLog(self.tr('<center>Section:{0}</center>\n<center>Account:{1}</center>\n<center>Type:{2}</center>').format(unicode(section,'utf8'),account,channel))
                 last_time = self.config.get(section,'time_'+channel)
                 header_format = self.config.get(section,'header_format_'+channel)
                 mailbox = self.config.get(section,'mailbox_'+channel)
@@ -418,7 +419,7 @@ class SyncTool(QObject):
                 try:
                     self.selectMailBox(mailbox)
                 except gaierror:
-                    self.setCurrentLog('<center>Network error or imap server error!</center>')
+                    self.setCurrentLog(self.tr('<center>Network error or imap server error!</center>'))
                     self.setMainIconSource(u'./images/sms-backup.png')
                     self.has_login = False
                     self.logout()
@@ -441,7 +442,7 @@ class SyncTool(QObject):
                 for i in range(0,count):
                     if self.stop_thread:
                         break
-                    self.setCurrentLog('<center>Section:%s Type:%s</center>\n<center>Total messages:</center>\n<center>%d/%d</center>'%(section.upper(),channel.upper(),i+1,count))
+                    self.setCurrentLog(self.tr('<center>Section:{0} Type:{1}</center>\n<center>Total messages:</center>\n<center>{2}/{3}</center>').format(unicode(section.upper(),'utf8'),channel.upper(),i+1,count))
                     message = self.getMessage(i)
                     mail,sms_time = self.createEmail(message)
                     try:
@@ -451,7 +452,7 @@ class SyncTool(QObject):
                             self.saveConfig()
                             self.imapser.expunge()
                     except:
-                        self.setCurrentLog('<center>Network error!</center>\n<center>Force Stop!!!</center>')
+                        self.setCurrentLog(self.tr('<center>Network error!</center>\n<center>Force Stop!!!</center>'))
                         self.stop_thread = True
                         if i!=0:
                             message = self.getMessage(i-1)
@@ -466,7 +467,7 @@ class SyncTool(QObject):
 
         self.logout()
         self.saveConfig()
-        self.setCurrentLog('<center>Sync has stopped!</center>')
+        self.setCurrentLog(self.tr('<center>Sync has stopped!</center>'))
         self.stop_thread = True
         self.thread = None
         self.setMainIconSource(u'./images/sms-backup.png')
@@ -517,7 +518,7 @@ class QSyncToolUI(QDeclarativeView):
         self.app = app
         self.smsTool = SyncTool()
         self.rootContext().setContextProperty('syncTool',self.smsTool)
-        self.setSource('/opt/synctool/qml/main.qml')
+        self.setSource('qml/main.qml')
         self.rootObject().quit.connect(self.app.quit)
         self.rootObject().hideSignal.connect(self.hide)
         self.dbusService = SyncService(self)
@@ -553,7 +554,12 @@ class SyncService(dbus.service.Object):
 
 
 if __name__ == "__main__":
+    os.chdir('/opt/synctool/')
+    translator = QTranslator()
     app = QApplication(sys.argv)
+    if translator.load(os.path.join('i18n',locale.getdefaultlocale()[0])):
+        app.installTranslator(translator)
+
     view = QSyncToolUI(app)
     view.showFullScreen()
     app.exec_()

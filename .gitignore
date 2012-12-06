@@ -1,3 +1,4 @@
 deb_dist
 sdist-dsc.log
 synctool.base64
+i18n/*.qm

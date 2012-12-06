@@ -34,10 +34,10 @@ PageStackWindow {
     }
     QueryDialog {
         id: quitConfirm
-        titleText: "Confirm Quit"
-        message: "Are you sure you want to quit?"
-        acceptButtonText: "Yes"
-        rejectButtonText: "No"
+        titleText: qsTr("Confirm Quit")
+        message: qsTr("Are you sure you want to quit SyncTool?")
+        acceptButtonText: qsTr("Yes")
+        rejectButtonText: qsTr("No")
         onAccepted: quit();
     }
 

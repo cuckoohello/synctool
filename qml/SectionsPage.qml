@@ -10,7 +10,7 @@ Page {
         visible: true
 
         ToolButton {
-            text: "Add"
+            text: qsTr("Add")
             anchors{
                 centerIn: parent
             }
@@ -33,7 +33,7 @@ Page {
     Header {
         id: header
         color: UI.HEADER_COLOR
-        content: 'Sessions'
+        content: qsTr("Sections")
     }
 
 
@@ -60,12 +60,11 @@ Page {
                 var subtitle = [{title:syncTool.getConfigOption(title,'type')}]
                 var iconSource = syncTool.getAccountIcon(syncTool.getConfigOption(title,'account'))
                 if (subtitle[0]['title'] == '')
-                    subtitle[0]['title'] = 'None'
+                    subtitle[0]['title'] = qsTr("None")
                 session_list.model.append({
                                               title: title,
                                               subtitle: subtitle,
                                               iconSource: iconSource,
-                                              //iconSource: "./images/sms-backup.png",
                                               filter: title
                                           })
             }

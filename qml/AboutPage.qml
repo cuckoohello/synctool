@@ -28,7 +28,7 @@ Page {
     Header {
         id: header
         color: UI.HEADER_COLOR
-        content: "About SMS/IM/CALL Backup"
+        content: qsTr("About SMS/IM/CALL Backup")
     }
 
     Flickable {
@@ -66,7 +66,7 @@ Page {
             Label {
                 width: parent.width
                 wrapMode: 'WordWrap'
-                text: '<center>Backup your im/sms/call logs (sms, call, skype, fetion, msn etc.) to an imap server such as Gmail.</center>'
+                text: qsTr('<center>Backup your im/sms/call logs (sms, call, skype, fetion, msn etc.) to an imap server such as Gmail.</center>')
             }
 
             Label {
@@ -87,7 +87,7 @@ Page {
 
             Label {
                 width: parent.width
-                text: '<center>Version:'+syncTool.getCurrentVersion()+'</center>'
+                text: qsTr('<center>Version:')+syncTool.getCurrentVersion()+'</center>'
             }
 
             BusyIndicator{
@@ -102,7 +102,7 @@ Page {
 
             Button{
                 anchors.horizontalCenter : parent.horizontalCenter
-                text: 'Check Update!'
+                text: qsTr('Check Update!')
                 enabled: ! getVersionIndicator.running
                 onClicked:  {
                     getVersionIndicator.running = true
@@ -113,11 +113,11 @@ Page {
                                     var version = xmlHttp.responseText;
                                     if (isNewerVersion(syncTool.getCurrentVersion(),version))
                                     {
-                                        show_info_bar('Find new version:'+version);
+                                        show_info_bar(qsTr('Find new version:')+version);
                                         Qt.openUrlExternally('http://cloud.github.com/downloads/cuckoohello/synctool/synctool_'+version+'_armel.deb')
                                     }else
                                     {
-                                        show_info_bar('Your version is up to date!');
+                                        show_info_bar(qsTr('Your version is up to date!'));
                                     }
                                 }
                             }

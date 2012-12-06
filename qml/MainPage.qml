@@ -31,17 +31,17 @@ Page {
         visualParent: pageStack
         MenuLayout {
             MenuItem {
-                text: "Account"
+                text: qsTr("Account")
                 enabled : !syncTool.isSyncing
                 onClicked:goto_page("AccountPage.qml",syncTool.getAccountInfo())}
-            MenuItem { text: "Sections"
+            MenuItem { text: qsTr("Sections")
                 enabled : !syncTool.isSyncing
                 onClicked:goto_page("SectionsPage.qml")}
-            MenuItem { text: "About"
+            MenuItem { text: qsTr("About")
                 onClicked:goto_page("AboutPage.qml")}
-            MenuItem { text: "Hide"
+            MenuItem { text: qsTr("Hide")
                 onClicked:hideSignal()}
-            MenuItem { text: "Exit"
+            MenuItem { text: qsTr("Exit")
                 enabled : !syncTool.isSyncing
                 onClicked:quitConfirm.open() }
         }
@@ -50,7 +50,7 @@ Page {
     Header {
         id: header
         color: UI.HEADER_COLOR
-        content: 'SMS/IM/Call Backup'
+        content: qsTr("SMS/IM/Call Backup")
     }
 
     Image {
@@ -98,12 +98,12 @@ Page {
             bottomMargin : parent.height*2/9
         }
         Button {
-            text: "Start"
+            text: qsTr("Start")
             enabled : !syncTool.isSyncing
             onClicked: syncTool.start()
         }
         Button {
-            text: "Stop"
+            text: qsTr("Stop")
             enabled : syncTool.isSyncing
             onClicked: syncTool.stop()
         }

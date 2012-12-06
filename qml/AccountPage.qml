@@ -19,7 +19,7 @@ Page {
             }
             spacing : UI.NORMAL_MARGIN
             ToolButton {
-                text: "Save"
+                text: qsTr("Save")
                 enabled: usernameText.text != '' && passwordText.text != '' && imapText.text != ''
                 onClicked: {
                     syncTool.saveAccountSettings(usernameText.text,passwordText.text,imapText.text)
@@ -27,7 +27,7 @@ Page {
                 }
             }
             ToolButton {
-                text: "Cancel"
+                text: qsTr("Cancel")
                 onClicked: pageStack.pop()
             }
         }
@@ -36,7 +36,7 @@ Page {
     Header {
         id: header
         color: UI.HEADER_COLOR
-        content: 'Account'
+        content: qsTr("Account")
     }
 
     Flickable {
@@ -62,7 +62,7 @@ Page {
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Username'
+                text: qsTr("Username")
             }
 
             TextField {
@@ -73,7 +73,7 @@ Page {
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Password'
+                text: qsTr("Password")
             }
 
             TextField {
@@ -85,7 +85,7 @@ Page {
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'IMAP Server'
+                text: qsTr("IMAP Server")
             }
 
             TextField {

@@ -70,7 +70,7 @@ Page {
             spacing : UI.NORMAL_MARGIN
 
             ToolButton {
-                text: "Save"
+                text: qsTr("Save")
                 width: isAdd? 186:140
                 enabled: sectionText.text!='' && (mess_button.checked ? (messMailbox != '' && messHeaderFormat !='') : true) && (call_button.checked ?  (callMailbox != '' && callHeaderFormat !='') : true)
                 onClicked: {
@@ -111,7 +111,7 @@ Page {
                 id : deleteLoader
             }
             ToolButton {
-                text: "Cancel"
+                text: qsTr("Cancel")
                 width: isAdd ? 186:140
                 onClicked: pageStack.pop();
             }
@@ -120,7 +120,7 @@ Page {
     Component {
         id: deleteToolButton
         ToolButton {
-            text: "Delete"
+            text: qsTr("Delete")
             width: 140
             onClicked:{
                 deleteConfirm.open()
@@ -130,10 +130,10 @@ Page {
 
     QueryDialog {
         id: deleteConfirm
-        titleText: "Confirm Delete"
-        message: "Are you sure you want to delete section "+section+"?"
-        acceptButtonText: "Yes"
-        rejectButtonText: "No"
+        titleText: qsTr("Confirm Delete")
+        message: qsTr("Are you sure you want to delete section ")+section+"?"
+        acceptButtonText: qsTr("Yes")
+        rejectButtonText: qsTr("No")
         onAccepted: {
             syncTool.deleteConfigSection(section)
             pageStack.pop()
@@ -144,7 +144,7 @@ Page {
     Header {
         id: header
         color: UI.HEADER_COLOR
-        content: 'Section'
+        content: qsTr("Section Setting")
     }
 
     Flickable {
@@ -182,7 +182,7 @@ Page {
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Section'
+                text: qsTr("Section")
             }
 
             TextField {
@@ -193,7 +193,7 @@ Page {
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Account'
+                text: qsTr("Account")
             }
 
             TumblerButton {
@@ -254,33 +254,33 @@ Page {
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: mess_button.text+' Mailbox'
+                text: mess_button.text+qsTr(" Mailbox")
             }
 
             TextField {
                 anchors.right : parent.right
                 anchors.left : parent.left
-                placeholderText: 'SMS'
+                placeholderText: qsTr("SMS")
                 text : messMailbox
                 onTextChanged: messMailbox = text
             }
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: mess_button.text+' Header Format'
+                text: mess_button.text+qsTr(" Header Format")
             }
 
             TextField {
                 anchors.right : parent.right
                 anchors.left : parent.left
-                placeholderText: 'SMS with %s'
+                placeholderText: qsTr("SMS with %s")
                 text : messHeaderFormat
                 onTextChanged: messHeaderFormat = text
             }
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: mess_button.text+' Since Time'
+                text: mess_button.text+qsTr(" Since Time")
             }
 
             Row{
@@ -314,7 +314,7 @@ Page {
                 }
             }
             CheckBox{
-                text: 'Mark as Seen'
+                text: qsTr("Mark as Seen")
                 checked: messFlagsSeen
                 onClicked: messFlagsSeen = checked
             }
@@ -334,33 +334,33 @@ Page {
             }
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Call Mailbox'
+                text: qsTr("Call Mailbox")
             }
 
             TextField {
                 anchors.right : parent.right
                 anchors.left : parent.left
-                placeholderText: 'Call log'
+                placeholderText: qsTr("Call log")
                 text : callMailbox
                 onTextChanged: callMailbox = text
             }
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Call Mail Header Format'
+                text: qsTr("Call log Header Format")
             }
 
             TextField {
                 anchors.right : parent.right
                 anchors.left : parent.left
-                placeholderText: 'Call with %s'
+                placeholderText: qsTr("Call with %s")
                 text : callHeaderFormat
                 onTextChanged: callHeaderFormat = text
             }
 
             Label {
                 font.pixelSize: UI.FONT_DEFAULT_SIZE
-                text: 'Call Since Time'
+                text: qsTr("Call Since Time")
             }
 
             Row{
@@ -394,7 +394,7 @@ Page {
                 }
             }
             CheckBox{
-                text: 'Mark as Seen'
+                text: qsTr("Mark as Seen")
                 checked: callFlagsSeen
                 onClicked: callFlagsSeen = checked
             }
@@ -403,7 +403,7 @@ Page {
 
     SelectionDialog {
         id: accountDialog
-        titleText: "Select Available Account"
+        titleText: qsTr("Select Available Account")
         selectedIndex: 0
 
         model: ListModel {}
@@ -435,7 +435,7 @@ Page {
             }
             if (accounts.length == 0)
             {
-                accountDialog.model.append({ name : 'No more account'});
+                accountDialog.model.append({ name : qsTr("No more account")});
                 sectionText.enabled  = false;
                 mess_button.enabled = false;
                 call_button.enabled = false;
