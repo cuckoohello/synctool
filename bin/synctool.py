@@ -19,7 +19,7 @@ import dbus.service
 import dbus.glib
 import dbus.mainloop
 
-version = '1.1.3'
+version = '1.1.4'
 
 class SyncTool(QObject):
     '''
@@ -331,7 +331,7 @@ class SyncTool(QObject):
             if dic['Direction'] == 'Outbound':
                 content += '(Outgoing Call)\n'
             elif dic['IsMissedCall'] == 1:
-                content += '(Missed Call)\n'
+                content = '(Missed Call)\n'
             else:
                 content += '(Incoming Call)\n'
 

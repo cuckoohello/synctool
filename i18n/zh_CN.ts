@@ -33,6 +33,11 @@
         <source>Your version is up to date!</source>
         <translation>您目前软件是最新版本！</translation>
     </message>
+    <message>
+        <location filename="../qml/AboutPage.qml" line="131"/>
+        <source>Force Quit!</source>
+        <translation>强制退出</translation>
+    </message>
 </context>
 <context>
     <name>AccountPage</name>

@@ -125,6 +125,13 @@ Page {
                     xmlHttp.send();
                 }
             }
+
+            Button{
+                anchors.horizontalCenter : parent.horizontalCenter
+                text: qsTr('Force Quit!')
+                visible : syncTool.isSyncing
+                onClicked: quitConfirm.open()
+            }
         }
     }
 
