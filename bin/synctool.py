@@ -456,14 +456,12 @@ class SyncTool(QObject):
                     except:
                         self.setCurrentLog(self.tr('<center>Network error!</center>\n<center>Force Stop!!!</center>'))
                         self.stop_thread = True
-                        if i!=0:
-                            message = self.getMessage(i-1)
-                        else:
-                            message = dict()
-                            message['EndTime'] = self.config.get(section,'time_'+channel)
 
-                if i !=0 :
-                    self.config.set(section,'time_'+channel,message['EndTime'])
+                if i !=0 or count == 1 :
+                    try:
+                        self.config.set(section,'time_'+channel,message['EndTime'])
+                    except:
+                        print 'Should not have any error here!'
                     self.saveConfig()
                     self.imapser.expunge()
 
