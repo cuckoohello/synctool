@@ -420,18 +420,23 @@ class SyncTool(QObject):
                     self.selectMailBox(mailbox)
                 except gaierror:
                     self.setCurrentLog('<center>Network error or imap server error!</center>')
+                    self.setMainIconSource(u'./images/sms-backup.png')
                     self.has_login = False
                     self.logout()
                     self.stop_thread = True
                     self.thread = None
+                    self.setCurrentStatus(False)
                     return
                 except imaplib.IMAP4.error as e:
+                    self.setMainIconSource(u'./images/sms-backup.png')
                     self.setCurrentLog(e.args[0])
                     print e.args
                     self.logout()
                     self.stop_thread = True
                     self.thread = None
+                    self.setCurrentStatus(False)
                     return
+
 
                 self.setSubjectFormat(header_format)
                 for i in range(0,count):
@@ -511,16 +516,19 @@ class QSyncToolUI(QDeclarativeView):
     def __init__(self,app):
         super(QSyncToolUI,self).__init__();
         self.app = app
-        smsTool = SyncTool()
-        self.rootContext().setContextProperty('syncTool',smsTool)
+        self.smsTool = SyncTool()
+        self.rootContext().setContextProperty('syncTool',self.smsTool)
         self.setSource('/opt/synctool/qml/main.qml')
         self.rootObject().quit.connect(self.app.quit)
         self.rootObject().hideSignal.connect(self.hide)
         self.dbusService = SyncService(self)
 
     def closeEvent(self,e):
-        e.ignore();
-        self.hide();
+        if self.smsTool.isSyncing: 
+            e.ignore(); 
+            self.hide();
+        else:
+            super(QSyncToolUI,self).closeEvent(e)
 
 class SyncService(dbus.service.Object):
 

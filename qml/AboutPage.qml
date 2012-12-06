@@ -103,6 +103,7 @@ Page {
             Button{
                 anchors.horizontalCenter : parent.horizontalCenter
                 text: 'Check Update!'
+                enabled: ! getVersionIndicator.running
                 onClicked:  {
                   getVersionIndicator.running = true
                   var xmlHttp = new XMLHttpRequest();
