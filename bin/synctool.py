@@ -19,7 +19,7 @@ import dbus.service
 import dbus.glib
 import dbus.mainloop
 
-version = '1.1.2'
+version = '1.1.3'
 
 class SyncTool(QObject):
     '''
@@ -391,6 +391,8 @@ class SyncTool(QObject):
             self.setCurrentLog(self.tr('<center>Read account config error!</center>'))
             self.stop_thread = True
             self.thread = None
+            self.has_login = False
+            self.setCurrentStatus(False)
             return
 
         sections = self.config.sections()
