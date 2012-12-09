@@ -259,32 +259,32 @@
         <translation>点击开始按钮开始同步！</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="372"/>
+        <location filename="synctool.py" line="379"/>
         <source>&lt;center&gt;Starting...&lt;/center&gt;</source>
         <translation>&lt;center&gt;开始...&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="382"/>
+        <location filename="synctool.py" line="389"/>
         <source>&lt;center&gt;Stopping....&lt;/center&gt;</source>
         <translation>&lt;center&gt;停止...&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="388"/>
+        <location filename="synctool.py" line="395"/>
         <source>&lt;center&gt;Loading config...&lt;/center&gt;</source>
         <translation>&lt;center&gt;载入配置...&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="391"/>
+        <location filename="synctool.py" line="398"/>
         <source>&lt;center&gt;Read account config error!&lt;/center&gt;</source>
         <translation>&lt;center&gt;读取用户配置出错！&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="422"/>
+        <location filename="synctool.py" line="434"/>
         <source>&lt;center&gt;Network error or imap server error!&lt;/center&gt;</source>
         <translation>&lt;center&gt;网络未连或imap服务器设置出错&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="455"/>
+        <location filename="synctool.py" line="468"/>
         <source>&lt;center&gt;Network error!&lt;/center&gt;
 &lt;center&gt;Force Stop!!!&lt;/center&gt;</source>
         <translation>&lt;center&gt;网络出错！&lt;/center&gt;
@@ -310,13 +310,50 @@
 &lt;center&gt;类型：{2}&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="synctool.py" line="445"/>
+        <location filename="synctool.py" line="457"/>
         <source>&lt;center&gt;Section:{0} Type:{1}&lt;/center&gt;
 &lt;center&gt;Total messages:&lt;/center&gt;
 &lt;center&gt;{2}/{3}&lt;/center&gt;</source>
         <translation>&lt;center&gt;通道：{0} 类型：{1}&lt;/center&gt;
 &lt;center&gt;同步状态&lt;/center&gt;
 &lt;center&gt;{2}/{3}&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="synctool.py" line="422"/>
+        <source>&lt;center&gt;Section:{0} Type:{1}&lt;/center&gt;
+&lt;center&gt;Account&lt;/center&gt;
+&lt;center&gt;{2}&lt;/center&gt;</source>
+        <translation>&lt;center&gt;通道：{0} 类型：{1}&lt;/center&gt;
+&lt;center&gt;账户&lt;/center&gt;
+&lt;center&gt;{2}&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="synctool.py" line="482"/>
+        <source>&lt;center&gt;Sync has stopped!&lt;/center&gt;
+&lt;center&gt;User stopped!&lt;/center&gt;</source>
+        <translation>&lt;center&gt;同步助手已停止&lt;/center&gt;
+&lt;center&gt;用户停止&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="synctool.py" line="484"/>
+        <source>&lt;center&gt;Sync has stopped!&lt;/center&gt;
+&lt;center&gt;Total:{0}&lt;/center&gt;</source>
+        <translation>&lt;center&gt;同步助手已停止&lt;/center&gt;
+&lt;center&gt;总共：{0}&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="synctool.py" line="488"/>
+        <source>&lt;center&gt;Sync has stopped!&lt;/center&gt;
+&lt;center&gt;No new messages!&lt;/center&gt;</source>
+        <translation>&lt;center&gt;同步助手已停止&lt;/center&gt;
+&lt;center&gt;没有新消息&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="synctool.py" line="486"/>
+        <source>&lt;center&gt;Sync has stopped!&lt;/center&gt;
+&lt;center&gt;No channels!!!&lt;/center&gt;</source>
+        <translation>&lt;center&gt;同步助手已停止&lt;/center&gt;
+&lt;center&gt;没有配置通道&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
