@@ -19,7 +19,7 @@ import dbus.service
 import dbus.glib
 import dbus.mainloop
 
-version = '1.1.5'
+version = '1.1.6'
 
 class SyncTool(QObject):
     '''
@@ -524,6 +524,9 @@ class ContactsManager(QObject):
                 label =  contact.displayLabel();
                 email =  QContactEmailAddress(contact.detail(QContactEmailAddress.DefinitionName)).emailAddress()
 
+            if number == '':
+                label = 'unknown'
+                email = 'unknown@unknown.email'
             if label == '': label = number
             if email == '': email = number+'@unknown.email'
             label = label.encode('utf8')

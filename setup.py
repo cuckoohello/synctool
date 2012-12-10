@@ -5,7 +5,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name="synctool",
-      version='1.1.5',
+      version='1.1.6',
       maintainer="Shan Yafeng",
       maintainer_email="cuckoohello@gmail.com",
       description="Backup your sms/im/call logs to an imap server such as gmail!",
