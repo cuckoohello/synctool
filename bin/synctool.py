@@ -12,7 +12,6 @@ import email.Message
 import time
 import base64
 import ConfigParser
-import threading
 from socket import gaierror
 import dbus
 import dbus.service
@@ -29,7 +28,9 @@ class SyncTool(QObject):
     '''
     def __init__(self):
         QObject.__init__(self)
-        self.manager = None
+        self.imapser = None
+        self.manager = SyncHelp.SyncTool()
+        self.timeZone = self.manager.getTimeZone()
         self.contactsManager = ContactsManager()
         self.has_login = False
         self.date_format = 'yyyy-MM-dd-hh:mm:ss'
@@ -42,13 +43,18 @@ class SyncTool(QObject):
         self.username = ''
         self.password = ''
         self.imapserver = ''
-        self.has_get_config = False
         self.stop_thread = True
         self.iconsDic = dict()
         self.iconsDic['ring/tel/ring'] = 'image://theme/icon-l-telephony'
         self.iconsDic['mmscm/mms/mms0'] = 'image://theme/icon-l-mms'
         self.has_started = False
         self.mainIconSource =  u'./images/sms-backup.png'
+        self.timer = QTimer(self)
+        self.timer.setInterval(5000)
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.imapTimeout)
+        self.thread = self.SyncThread(self)
+        self.thread.finished.connect(self.thread_stop_cleanup)
 
     def getCurrentStatus(self):
         return self.has_started
@@ -82,13 +88,13 @@ class SyncTool(QObject):
 
     @Slot(result='QVariant')
     def getAccountInfo(self):
-        if self.has_get_config == False:
+        if self.config == None:
             self.loadConfig()
         return {u'username':unicode(self.username,'utf8'),u'password':unicode(self.password,'utf8'),u'imapserver':unicode(self.imapserver,'utf8')}
 
     @Slot(result='QVariant')
     def getConfigSections(self):
-        if self.has_get_config == False:
+        if self.config == None:
             self.loadConfig()
         sections = self.config.sections()
         try:
@@ -133,7 +139,7 @@ class SyncTool(QObject):
 
     @Slot(unicode,unicode,result=unicode)
     def getConfigOption(self,section,option):
-        if self.has_get_config == False:
+        if self.config == None:
             self.loadConfig()
         try:
             return unicode(self.config.get(section.encode('utf8'),option.encode('utf8')),'utf8')
@@ -198,9 +204,6 @@ class SyncTool(QObject):
         dic['date_format'] = self.date_format
         self.mess_type = mess_type
         self.channel = account
-        if self.manager == None:
-            self.manager = SyncHelp.SyncTool()
-            self.timeZone = self.manager.getTimeZone()
         self.currentMessageNumber = -1
         self.currentMessageIdChanged.emit()
         self.total =  self.manager.selectChannel(dic)
@@ -236,7 +239,7 @@ class SyncTool(QObject):
 
     @Slot(result='QVariant')
     def getAvailableAccounts(self):
-        if self.has_get_config == False:
+        if self.config == None:
             self.loadConfig()
         sections = self.config.sections()
         try:
@@ -257,9 +260,9 @@ class SyncTool(QObject):
     def login(self):
         if self.has_login:
             return
-        self.has_login = True
         self.imapser = imaplib.IMAP4_SSL(self.imapserver)
         ret,data = self.imapser.login(self.username,self.password)
+        self.has_login = True
         data = data[0].split()
         if self.imapserver == 'imap.gmail.com':
             self.accountEmail = data[0]
@@ -276,19 +279,6 @@ class SyncTool(QObject):
                 self.accountEmail = self.username+self.imapserver.replace('imap.','@')
                 self.accountTitle = self.accountEmail
         return
-
-    def logout(self):
-        if self.has_login: 
-            try:
-                self.imapser.close()
-                self.imapser.logout()
-            except imaplib.IMAP4.error:
-                pass
-            del self.imapser
-            self.has_login = False
-        if self.manager:
-            del self.manager
-            self.manager = None
 
     def selectMailBox(self,mailbox):
         if self.has_login == False:
@@ -389,6 +379,12 @@ class SyncTool(QObject):
             email.Encoders.encode_base64(attachment)
         return attachment
 
+    @Slot()
+    def imapTimeout(self):
+        self.setMainIconSource(u'./images/sms-backup.png')
+        self.setCurrentLog(self.tr('<center>Upload Message Timeout!</center>\n<center>Force Stop!!!</center>'))
+        self.stop_thread = True
+
     def backupMessage(self,sms,flags,sms_time):
         return self.imapser.append(self.mailbox,flags,imaplib.Time2Internaldate(sms_time),str(sms))
 
@@ -400,7 +396,6 @@ class SyncTool(QObject):
             del self.config
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.configFile)
-        self.has_get_config = True
         if self.config.has_section('account'):
             self.username = self.config.get('account','username')
             self.password = base64.decodestring(self.config.get('account','password'))
@@ -414,13 +409,11 @@ class SyncTool(QObject):
 
     @Slot()
     def start(self):
-        if self.thread:
+        if self.thread.isRunning():
             return
         self.setCurrentLog(self.tr('<center>Starting...</center>'))
         self.stop_thread = False
         self.setCurrentStatus(True)
-        self.thread = threading.Thread(target=self.thread_proc)
-        self.thread.setDaemon(True)
         self.thread.start()
 
     @Slot()
@@ -429,107 +422,93 @@ class SyncTool(QObject):
             self.setCurrentLog(self.tr('<center>Stopping....</center>'))
             self.stop_thread = True
 
-    def thread_proc(self):
-        self.currentMessageNumber = -1
-        self.currentMessageIdChanged.emit()
-        self.setCurrentLog(self.tr('<center>Loading config...</center>'))
-        ret = self.loadConfig()
-        if ret == -1:
-            self.setCurrentLog(self.tr('<center>Read account config error!</center>'))
-            self.stop_thread = True
-            self.thread = None
-            self.has_login = False
-            self.setCurrentStatus(False)
-            return
-
-        sections = self.config.sections()
-        sections.remove('account')
-        num_synced_messages = 0
-        num_channels = 0
-
-        for section in sections:
-            if self.stop_thread:
-                break
-            account = self.config.get(section,'account')
-            self.setMainIconSource(self.getAccountIcon(unicode(account,'utf8')))
-            channels = self.config.get(section,'type').split('/')
-            for channel in channels:
-                if channel == '':
-                    continue
-                if self.stop_thread:
-                    break
-                num_channels = num_channels+1
-                self.setCurrentLog(self.tr('<center>Section:{0} Type:{1}</center>\n<center>Account</center>\n<center>{2}</center>').format(unicode(section,'utf8'),channel,account))
-                last_time = self.config.get(section,'time_'+channel)
-                header_format = self.config.get(section,'header_format_'+channel)
-                mailbox = self.config.get(section,'mailbox_'+channel)
-                flags = self.config.get(section,'flags_'+channel)
-                count = self.selectChannel(channel,account,last_time)
-                if count == 0:
-                    continue
-
-                try:
-                    self.selectMailBox(mailbox)
-                except gaierror:
-                    self.setCurrentLog(self.tr('<center>Network error or imap server error!</center>'))
-                    self.setMainIconSource(u'./images/sms-backup.png')
-                    self.has_login = False
-                    self.logout()
-                    self.stop_thread = True
-                    self.thread = None
-                    self.setCurrentStatus(False)
-                    return
-                except imaplib.IMAP4.error as e:
-                    self.setMainIconSource(u'./images/sms-backup.png')
-                    self.setCurrentLog(e.args[0])
-                    print e.args
-                    self.logout()
-                    self.stop_thread = True
-                    self.thread = None
-                    self.setCurrentStatus(False)
-                    return
-
-
-                self.setSubjectFormat(header_format)
-                for i in range(0,count):
-                    if self.stop_thread:
-                        break
-                    self.setCurrentLog(self.tr('<center>Section:{0} Type:{1}</center>\n<center>Total messages:</center>\n<center>{2}/{3}</center>').format(unicode(section.upper(),'utf8'),channel.upper(),i+1,count))
-                    message = self.getMessage(i)
-                    mail,sms_time = self.createEmail(message)
-                    num_synced_messages = num_synced_messages+1
-                    try:
-                        self.backupMessage(mail,flags,sms_time)
-                        if i%50 == 25:
-                            self.config.set(section,'time_'+channel,message['EndTime'])
-                            self.saveConfig()
-                            self.imapser.expunge()
-                    except:
-                        self.setCurrentLog(self.tr('<center>Network error!</center>\n<center>Force Stop!!!</center>'))
-                        self.stop_thread = True
-
-                if i !=0 or count == 1 :
-                    try:
-                        self.config.set(section,'time_'+channel,message['EndTime'])
-                    except:
-                        print 'Should not have any error here!'
-                    self.saveConfig()
-                    self.imapser.expunge()
-
-        self.logout()
+    @Slot()
+    def thread_stop_cleanup(self):
         self.saveConfig()
-        if self.stop_thread:
-            self.setCurrentLog(self.tr('<center>Sync has stopped!</center>\n<center>User stopped!</center>'))
-        elif num_synced_messages:
-            self.setCurrentLog(self.tr('<center>Sync has stopped!</center>\n<center>Total:{0}</center>').format(num_synced_messages))
-        elif num_channels == 0:
-            self.setCurrentLog(self.tr('<center>Sync has stopped!</center>\n<center>No channels!!!</center>'))
-        else:
-            self.setCurrentLog(self.tr('<center>Sync has stopped!</center>\n<center>No new messages!</center>'))
         self.stop_thread = True
-        self.thread = None
-        self.setMainIconSource(u'./images/sms-backup.png')
+        self.has_login = False
         self.setCurrentStatus(False)
+
+    class SyncThread(QThread):
+        def __init__(self,tool):
+            super(SyncTool.SyncThread,self).__init__()
+            self.synctool = tool
+            self.setTerminationEnabled(True)
+
+        def run(self):
+            self.synctool.currentMessageNumber = -1
+            self.synctool.currentMessageIdChanged.emit()
+            self.synctool.setCurrentLog(self.synctool.tr('<center>Loading config...</center>'))
+            ret = self.synctool.loadConfig()
+            if ret == -1:
+                self.synctool.setCurrentLog(self.synctool.tr('<center>Read account config error!</center>'))
+                return
+
+            sections = self.synctool.config.sections()
+            sections.remove('account')
+            num_synced_messages = 0
+            num_channels = 0
+
+            for section in sections:
+                if self.synctool.stop_thread:
+                    break
+                account = self.synctool.config.get(section,'account')
+                self.synctool.setMainIconSource(self.synctool.getAccountIcon(unicode(account,'utf8')))
+                channels = self.synctool.config.get(section,'type').split('/')
+                for channel in channels:
+                    if channel == '':
+                        continue
+                    if self.synctool.stop_thread:
+                        break
+                    num_channels = num_channels+1
+                    self.synctool.setCurrentLog(self.synctool.tr('<center>Section:{0} Type:{1}</center>\n<center>Account</center>\n<center>{2}</center>').format(unicode(section,'utf8'),channel,account))
+                    last_time = self.synctool.config.get(section,'time_'+channel)
+                    header_format = self.synctool.config.get(section,'header_format_'+channel)
+                    mailbox = self.synctool.config.get(section,'mailbox_'+channel)
+                    flags = self.synctool.config.get(section,'flags_'+channel)
+                    count = self.synctool.selectChannel(channel,account,last_time)
+                    if count == 0:
+                        continue
+
+                    try:
+                        self.synctool.selectMailBox(mailbox)
+                    except gaierror, error:
+                        self.synctool.setCurrentLog(self.synctool.tr('<center>Network error or imap server error!</center>'))
+                        self.synctool.setMainIconSource(u'./images/sms-backup.png')
+                        return
+                    except imaplib.IMAP4.error as e:
+                        self.synctool.setMainIconSource(u'./images/sms-backup.png')
+                        self.synctool.setCurrentLog(e.args[0])
+                        print e.args
+                        return
+
+                    self.synctool.setSubjectFormat(header_format)
+                    for i in range(0,count):
+                        if self.synctool.stop_thread:
+                            break
+                        self.synctool.setCurrentLog(self.synctool.tr('<center>Section:{0} Type:{1}</center>\n<center>Total messages:</center>\n<center>{2}/{3}</center>').format(unicode(section.upper(),'utf8'),channel.upper(),i+1,count))
+                        message = self.synctool.getMessage(i)
+                        mail,sms_time = self.synctool.createEmail(message)
+                        self.synctool.timer.start()
+                        try:
+                            self.synctool.backupMessage(mail,flags,sms_time)
+                            self.synctool.config.set(section,'time_'+channel,message['EndTime'])
+                            num_synced_messages = num_synced_messages+1
+                        except:
+                            self.synctool.setCurrentLog(self.synctool.tr('<center>Network error!</center>\n<center>Force Stop!!!</center>'))
+                            self.synctool.stop_thread = True
+
+                        self.synctool.timer.stop()
+
+            if self.synctool.stop_thread:
+                self.synctool.setCurrentLog(self.synctool.tr('<center>Sync has stopped!</center>\n<center>User stopped!</center>'))
+            elif num_synced_messages:
+                self.synctool.setCurrentLog(self.synctool.tr('<center>Sync has stopped!</center>\n<center>Total:{0}</center>').format(num_synced_messages))
+            elif num_channels == 0:
+                self.synctool.setCurrentLog(self.synctool.tr('<center>Sync has stopped!</center>\n<center>No channels!!!</center>'))
+            else:
+                self.synctool.setCurrentLog(self.synctool.tr('<center>Sync has stopped!</center>\n<center>No new messages!</center>'))
+            self.synctool.setMainIconSource(u'./images/sms-backup.png')
 
 class ContactsManager(QObject):
     '''
