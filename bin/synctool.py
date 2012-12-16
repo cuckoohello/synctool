@@ -20,7 +20,7 @@ import dbus.mainloop
 import email.Encoders, email.MIMENonMultipart, email.MIMEMultipart, email.MIMEText
 import re
 
-version = '1.1.6'
+version = '1.2.0'
 
 class SyncTool(QObject):
     '''
@@ -382,8 +382,7 @@ class SyncTool(QObject):
     @Slot()
     def imapTimeout(self):
         self.setMainIconSource(u'./images/sms-backup.png')
-        self.setCurrentLog(self.tr('<center>Upload Message Timeout!</center>\n<center>Force Stop!!!</center>'))
-        self.stop_thread = True
+        self.setCurrentLog(self.tr('<center>Upload Message Timeout!</center>\n<center>Force Stop!!!</center>\n<center>Long wait...</center>'))
 
     def backupMessage(self,sms,flags,sms_time):
         return self.imapser.append(self.mailbox,flags,imaplib.Time2Internaldate(sms_time),str(sms))

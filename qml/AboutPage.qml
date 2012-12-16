@@ -114,14 +114,14 @@ Page {
                                     if (isNewerVersion(syncTool.getCurrentVersion(),version))
                                     {
                                         show_info_bar(qsTr('Find new version:')+version);
-                                        Qt.openUrlExternally('http://cloud.github.com/downloads/cuckoohello/synctool/synctool_'+version+'_armel.deb')
+                                        Qt.openUrlExternally('http://synctool.googlecode.com/files/synctool_'+version+'_armel.deb')
                                     }else
                                     {
                                         show_info_bar(qsTr('Your version is up to date!'));
                                     }
                                 }
                             }
-                    xmlHttp.open( "GET", "http://cloud.github.com/downloads/cuckoohello/synctool/version.txt")
+                    xmlHttp.open( "GET", "http://synctool.googlecode.com/files/version.txt")
                     xmlHttp.send();
                 }
             }
