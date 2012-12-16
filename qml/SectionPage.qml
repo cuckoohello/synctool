@@ -208,13 +208,14 @@ Page {
                 exclusive: false
                 Button {
                     id: mess_button
-                    text: accountButton.text == 'ring/tel/ring' ? 'SMS' : 'IM'
+                    text: accountButton.text == 'ring/tel/ring' ? 'SMS' : (accountButton.text == 'mmscm/mms/mms0' ? 'MMS':'IM')
                     checkable: true
                 }
                 Button {
                     id: call_button
                     text: "CALL"
                     checkable: true
+                    enabled: accountButton.text != 'mmscm/mms/mms0'
                 }
             }
         }
@@ -447,7 +448,7 @@ Page {
             accountDialog.model.append({ name : account});
             deleteLoader.sourceComponent = deleteToolButton
             var types = syncTool.getConfigOption(section,'type').split('/');
-            var accountType = (account == 'ring/tel/ring') ? 'SMS' : 'IM';
+            var accountType = (account == 'ring/tel/ring') ? 'SMS' : (account == 'mmscm/mms/mms0' ? 'MMS':'IM')
             var i;
             for (i in types)
             {

@@ -18,6 +18,8 @@ import dbus
 import dbus.service
 import dbus.glib
 import dbus.mainloop
+import email.Encoders, email.MIMENonMultipart, email.MIMEMultipart, email.MIMEText
+import re
 
 version = '1.1.6'
 
@@ -44,6 +46,7 @@ class SyncTool(QObject):
         self.stop_thread = True
         self.iconsDic = dict()
         self.iconsDic['ring/tel/ring'] = 'image://theme/icon-l-telephony'
+        self.iconsDic['mmscm/mms/mms0'] = 'image://theme/icon-l-mms'
         self.has_started = False
         self.mainIconSource =  u'./images/sms-backup.png'
 
@@ -243,7 +246,6 @@ class SyncTool(QObject):
         accounts = self.getAccounts()
         for section in sections:
             accounts.remove(self.config.get(section,'account'))
-        accounts.remove('mmscm/mms/mms0')
         accs = []
         for account in accounts:
             accs.append(unicode(account,'utf8'))
@@ -307,7 +309,10 @@ class SyncTool(QObject):
         return
 
     def createEmail(self,dic):
-        mail = email.Message.Message()
+        if self.mess_type == 'MMS':
+            mail = email.MIMEMultipart.MIMEMultipart()
+        else:
+            mail = email.Message.Message()
         mail['Subject'] = self.encodeMailUTF8(self.subject_format%(dic['Name']))
         if dic['Direction'] == 'Inbound':
             mail['From'] = self.encodeMailUTF8(dic['Name'])+'<'+dic['Email'] +'>'
@@ -342,12 +347,47 @@ class SyncTool(QObject):
             else:
                 content += '(Incoming Call)\n'
 
-            mail.set_payload(content)
+            mail.set_payload(content,'utf8')
+        elif self.mess_type == 'MMS':
+            for i in range(0,len(dic['MessageParts'])):
+                content = dic['MessageParts'][i]
+                if content['contentLocation'] != '':
+                    mail.attach(self.addContentFromFile(content['contentLocation'],content['contentType']))
+                else:
+                    filename = re.findall(r'<(.*)>',content['contentId'])[0]
+                    mail.attach(self.addContentFromFile(filename, content['contentType'],content['plainText']))
+            mail.attach(email.MIMEText.MIMEText("Subject: %s\r%s"%(dic['Subject'],dic['FreeText']),'plain','utf8'))
         else:
-            mail.set_payload(dic['FreeText'])
+            mail.set_payload(dic['FreeText'],'utf8')
 
-        mail.set_charset('utf-8')
         return [mail,sms_time]
+
+    def addContentFromFile(self,filename, contentType, contentBuffer = None, encoding = None):
+        """
+        will add the attachment to our message
+        """
+        file2=os.path.split(filename)[1]
+        try:
+            (generic_type,specific_type)=contentType.split("/")
+        except KeyError:
+            (generic_type,specific_type)="application/octet-steam".split("/")
+        attachment = email.MIMENonMultipart.MIMENonMultipart(generic_type,specific_type+"; name="+file2)
+        if contentBuffer == None:
+            fp=open(filename,'rb')
+            attachment.set_payload(fp.read())
+            fp.close()
+        else:
+            attachment.set_payload(contentBuffer)
+        attachment.add_header("Content-Disposition","attachment; filename="+file2)
+        attachment.add_header("Content-location",file2)
+        attachment.add_header("Content-ID","<"+file2+">")
+        if encoding == "quopri":
+            email.Encoders.encode_quopri(attachment)
+        elif encoding == "7or8bit":
+            email.Encoders.encode_7or8bit(attachment)
+        else:
+            email.Encoders.encode_base64(attachment)
+        return attachment
 
     def backupMessage(self,sms,flags,sms_time):
         return self.imapser.append(self.mailbox,flags,imaplib.Time2Internaldate(sms_time),str(sms))
