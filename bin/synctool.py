@@ -50,7 +50,7 @@ class SyncTool(QObject):
         self.has_started = False
         self.mainIconSource =  u'./images/sms-backup.png'
         self.timer = QTimer(self)
-        self.timer.setInterval(5000)
+        self.timer.setInterval(10000)
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.imapTimeout)
         self.thread = self.SyncThread(self)
@@ -382,7 +382,7 @@ class SyncTool(QObject):
     @Slot()
     def imapTimeout(self):
         self.setMainIconSource(u'./images/sms-backup.png')
-        self.setCurrentLog(self.tr('<center>Upload Message Timeout!</center>\n<center>Force Stop!!!</center>\n<center>Long wait...</center>'))
+        self.setCurrentLog(self.tr('<center>Upload Message Timeout!</center>\n<center>Long long wait...</center>'))
 
     def backupMessage(self,sms,flags,sms_time):
         return self.imapser.append(self.mailbox,flags,imaplib.Time2Internaldate(sms_time),str(sms))

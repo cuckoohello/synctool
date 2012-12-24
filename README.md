@@ -5,6 +5,10 @@ Backup your sms/mms/im/call logs to an imap server such as gmail for Nokia N9/N9
 
 Download packages from  [code.google.com/p/synctool/downloads/list](http://code.google.com/p/synctool/downloads/list)
 
+Privacy Policy
+---------
+This software uses imap service to backup your sms/mms/im/call logs, but ***it will not collect your personal information*** and the password of the imap account has been encrypted before local store. Please rest assured while using this app.
+
 Changelog
 ---------
 
